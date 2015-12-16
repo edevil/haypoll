@@ -21,6 +21,7 @@ RUN mix deps.get --only prod
 RUN mix compile
 
 # Compile assets
+RUN npm install
 RUN node_modules/brunch/bin/brunch build --production
 RUN mix phoenix.digest
 
