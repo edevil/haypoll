@@ -33,9 +33,13 @@ defmodule Haypoll.PollController do
 
       case Repo.insert(changeset) do
         {:ok, poll} ->
-          Enum.map poll_params["entries"], fn entry ->
-            entry = build(poll, :entries, %{title: entry})
-            Repo.insert! entry
+          if Map.has_key?(poll_params, "entries") do
+            Enum.map poll_params["entries"], fn entry ->
+              entry = build(poll, :entries, %{title: entry})
+              Repo.insert! entry
+            end
+          else
+            {:ok, poll}
           end
         {:error, changeset} ->
           Repo.rollback changeset
