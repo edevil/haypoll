@@ -1,0 +1,11 @@
+app:
+  build:
+    image: app
+    dockerfile_path: Dockerfile
+  environment:
+    DB_HOST: postgres
+    DB_PASS: postgres
+  links:
+    - postgres
+postgres:
+   image: postgres:9.4
