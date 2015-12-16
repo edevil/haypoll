@@ -1,0 +1,2 @@
+- service: app
+  command: bash -c "sleep 20; MIX_ENV=test mix test 1>&1"
