@@ -1,5 +1,6 @@
 - service: app
-  command: bash -c "sleep 20; MIX_ENV=test mix test 1>&1"
+  command: ./wait_for_services.sh
+  command: bash -c "MIX_ENV=test mix test 1>&1"
 - service: app
   type: push
   image_name: edevil/haypoll
