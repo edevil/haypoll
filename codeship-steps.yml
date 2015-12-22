@@ -6,3 +6,5 @@
   image_tag: "latest"
   registry: https://index.docker.io/v1/
   encrypted_dockercfg_path: dockercfg.encrypted
+- service: rancherdeployment
+  command: --verbose -p Haypoll up --upgrade --pull --force-upgrade --confirm-upgrade -d haypoll

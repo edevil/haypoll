@@ -1,0 +1,25 @@
+haypoll:
+  environment:
+    DB_HOST: postgres
+    DB_PASS: postgres
+  labels:
+    io.rancher.container.pull_image: always
+  tty: true
+  image: edevil/haypoll
+  links:
+  - database:postgres
+  stdin_open: true
+database:
+  labels:
+    io.rancher.container.pull_image: always
+  tty: true
+  image: postgres:9.4
+  stdin_open: true
+haypolllb:
+  ports:
+  - 80:8080
+  tty: true
+  image: rancher/load-balancer-service
+  links:
+  - haypoll
+  stdin_open: true

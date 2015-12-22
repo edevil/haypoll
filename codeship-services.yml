@@ -8,4 +8,9 @@ app:
   links:
     - postgres
 postgres:
-   image: postgres:9.4
+  image: postgres:9.4
+rancherdeployment:
+  image: edevil/docker-rancher-compose
+  encrypted_env_file: compose/dev-deploy.env.encrypted
+  volumes:
+    - ./compose:/app:ro
