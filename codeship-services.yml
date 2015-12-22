@@ -13,4 +13,4 @@ rancherdeployment:
   image: edevil/docker-rancher-compose
   encrypted_env_file: compose/dev-deploy.env.encrypted
   volumes:
-    - ./compose:/app:ro
+    - ./compose:/app
