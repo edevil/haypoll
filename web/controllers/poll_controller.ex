@@ -35,7 +35,7 @@ defmodule Haypoll.PollController do
         {:ok, poll} ->
           if Map.has_key?(poll_params, "entries") do
             Enum.map poll_params["entries"], fn entry ->
-              entry = build(poll, :entries, %{title: entry})
+              entry = build_assoc(poll, :entries, %{title: entry})
               Repo.insert! entry
             end
           else
