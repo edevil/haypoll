@@ -1,0 +1,36 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: haypoll
+spec:
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: haypoll
+        tier: frontend
+    spec:
+      containers:
+      - name: haypoll
+        image: edevil/haypoll:latest
+        imagePullPolicy: Always
+        resources:
+          requests:
+            cpu: 100m
+            memory: 100Mi
+        env:
+          - name: DB_HOST
+            value: database
+          - name: DB_PASS
+            value: postgres
+        ports:
+        - containerPort: 8080
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8080
+            httpHeaders:
+              - name: X-Custom-Header
+                value: Awesome
+          initialDelaySeconds: 15
+          timeoutSeconds: 1
