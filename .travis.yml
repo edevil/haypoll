@@ -1,4 +1,5 @@
 sudo: required
+group: edge
 
 language: elixir
 elixir:
@@ -21,7 +22,7 @@ install:
   - docker build -t edevil/haypoll:$IMAGE_TAG .
 
 script:
-  - docker run edevil/haypoll:$IMAGE_TAG -e DB_HOST=$DB_HOST -e MIX_ENV=test "mix test 1>&1"
+  - docker run -e DB_HOST=$DB_HOST -e MIX_ENV=test edevil/haypoll:$IMAGE_TAG "mix test 1>&1"
 
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
