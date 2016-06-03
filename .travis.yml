@@ -20,7 +20,7 @@ before_script:
   - docker run -d --name=database postgres
 
 script:
-  - docker run -e DB_HOST=database -e MIX_ENV=test --link=database $IMAGE_NAME:$IMAGE_TAG bash -c "mix test 1>&1"
+  - docker run -e DB_HOST=database -e MIX_ENV=test --link=database $IMAGE_NAME:$IMAGE_TAG bash -c "./wait_for_services.sh && mix test 1>&1"
 
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
