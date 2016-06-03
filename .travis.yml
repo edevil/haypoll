@@ -25,6 +25,6 @@ script:
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
   - docker push edevil/haypoll:$IMAGE_TAG
-  - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG" haypoll-deployment.yml
+  - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-deployment.yml
   - cat haypoll-deployment.yml
-  - docker run --rm -v .:/app lachlanevenson/k8s-kubectl:v1.2.4 --server=$KUBERNETES_HOST --certificate-authority=/app/ca.pem --token=$K8S_TOKEN  apply -f /app/haypoll-deployment.yml --namespace=haypoll
+  - docker run --rm -v `pwd`:/app lachlanevenson/k8s-kubectl:v1.2.4 --server=$KUBERNETES_HOST --certificate-authority=/app/ca.pem --token=$K8S_TOKEN apply -f /app/haypoll-deployment.yml --namespace=haypoll
