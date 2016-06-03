@@ -4,7 +4,7 @@ services:
   - docker
 
 env:
-  - IMAGE_TAG=$TRAVIS_BRANCH.$TRAVIS_COMMIT
+  - IMAGE_TAG="$TRAVIS_BRANCH.$TRAVIS_COMMIT"
   - secure: "cpZSk/nywLaqJNDvuLuz/O9bcnsDo7j+b5tcJ/fKhH5hlImOTXjLIdm3MUuz4n58of76mfO3SYaTxblrM4k85derLtPyt7xBZ/MrQsefsq7NeQpJ4jOdhRMYGzAZyoUg7Bf3SWv5MKcCs0qS1wQxh5zJsG65td6FSr3AyKh2nmndP3WYDP+5wTdx3vOAog8MCfH71LgQu7XfG8eOwzNEEDGYTL9JNKLrSPLrBcLolrXkh+YoIWuXwauEIJpJ2WCJ2HJeypKHptT7KxVBDXHYQzw9oqSds8NuUjuVsNuBcXevN6MFoha4BDb+Nc5dfix4+BY39WtLXYtayjXeUbEyeezK5QfQHDA54/jknxmCm9FpuXnafnmGXH3PZl+SzOPTMhLIfXITKN5mrqR6ef3RcFOfxk2XGS/kTEBmExRwwywzXFIrcmBmkDJEELIjPqqm3BuxrVmd3gANbSrbMbbGoyBh8pgYcKN0hmhGPgahE2FOi33fr8SfqWpNW91pnAN3jE74BmZlp4Xh8XtP28UltRAbTbO64oz+1g5eLpwLk+i9y+QRxW695YhItNVlOpFjOVZNVSnwKlGaM3qzvDH5MS5SxunQzUXGw2h4nFHiczVWgzXr8eBgL+Z9UJg5m8HkENJUPTauAOg9M6F7vipevqQqlodrOgZsuGwz0yDpYrI="
   - secure: "Qv8gndv4lmpMmZH43trqFgzSSV1YTTrUOZrzEeFBbwdoA8lmv7Drj5hYL1kBDxUzmn1IsTHbDTWK/mK4NzXIz7womxCXiFVj4NJsbVDelagQfVhWn2ZM3CxsITwsuumbdOpDjlW5HaQiGJfSV7wmc3/Vy8nQrOKXR3gciNqT9+a439KeLeqXjCrBp+DqBvziiXhtovFE37hqzQKn0Np7NMOZy0oxg/2nev/dOLKB65slp/zF1mocw/mCpZhtWCQh3yJg7STPWa3JppgbTLmzkZwXLohfxpekyEx474k+6XM4gEi6/4Vv4UDxx21kDXtDwr01ekC03AHLVPa/od0YxZCzCygrVWVsXmPVPCx1qD/AsaHbuLNf3u09H/dHwt/7HZmFGge4DtsTEl0gmsoL5yUi/g5nKOAE6e3znMfgAPFc8y2YJ0cRpzdAZYwBTX2u2ev6JLLIzZKC5rSfFx06KfcgkkkO4ygCelgkKHEjzNEpw7ntwi9N72zpWD6kdsOSTwVzLni98JpZRaxb1TfRPeyx88uR//CA1vp0VRd9EOc6Yl5F1WMXM6b1OCinIN/ITIzcRvhvUcj1c6Hfa5F4BsiQyKV372od5A/8qlfB6NbDG4Hol5V3VcIzQe02vKRyYFOQW9ATnA7c9Nch5UpbD1cChpD/knnQ6IqlVfEPchs="
   - secure: "t1VyXy1M6CYgGBSxu9ioJf6EjDhTh80fLuqquGAgzb6snRpNa3rFGbnBj3BjKTwjXFfYAGOVKyIlj6DzWCFiWx8DabdYRLJhiWYjtcXu6LriYjIpupZw0fCQGcDcx/NN68tcgTQFNrG3CSimBZDX0o86Dy+SSbLLOse9mqfEV61nb4nErtKZTfJzBauBvbv3L19abjUtUGY4/xc6FpZ7lau6DwhaEy4Dt5vPSwngQ4UBYfINnIGaFH/PFTyoumZLlSGkPsTitEOPdI5A6abVfDuZrTBv5FVEKjNxJqb1qaZO+vy1Ka58PU1LRwJnAjKE51HPPXDum0A9niXmt8LtFlv6HmHKXfMyIzsTTIJOy6NmB4v5sgsjXbxPKC56ntZOAzeAteJSa+aD9G/Jp5EKCWUGa6s+g9WvG/zx3fIk3ilOzlNu6DlLIjPvhotelKfiltPRONYPXTL3aVyt0rHZzj0ZUOcZHG1pA9z0tpbxdzxd+VC/laliPq7xf2/QHzRnB55MS9S28XURLugLduBAiGWSwNPz4QYTf+1SDCnO3aDJWQDkxAw5JVJOcduIW05lC+MG5f2XNVgqO+wTMYNEBfE79Ge0giGIW9L5bv0lK21Ntqw2eK8Rza5EgkUGE5k21sVAEBFFBBcWPNZ/XkBFgd3ohnGJtj0izwmt0uwrW3U="
@@ -13,11 +13,10 @@ install:
   - docker build -t edevil/haypoll:$IMAGE_TAG .
 
 before_script:
-  - docker network create -d bridge isolated_nw
-  - docker run -d -p 127.0.0.1:5432:5432 --net=isolated_nw --name=database postgres
+  - docker run -d --name=database postgres
 
 script:
-  - docker run -e DB_HOST=database -e MIX_ENV=test --net=isolated_nw edevil/haypoll:$IMAGE_TAG bash -c "mix test 1>&1"
+  - docker run -e DB_HOST=database -e MIX_ENV=test --link=database edevil/haypoll:$IMAGE_TAG bash -c "mix test 1>&1"
 
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
