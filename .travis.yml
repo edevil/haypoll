@@ -1,12 +1,14 @@
 sudo: required
 
+language: generic
+
 services:
   - docker
 
 env:
   global:
     - IMAGE_NAME="edevil/haypoll"
-    - IMAGE_TAG="$TRAVIS_BRANCH.$TRAVIS_COMMIT"
+    - IMAGE_TAG="$TRAVIS_BRANCH.${TRAVIS_COMMIT::8}"
     - KUBERNETES_HOST="https://kuberneteslabs-master.westeurope.cloudapp.azure.com"
     - secure: "cpZSk/nywLaqJNDvuLuz/O9bcnsDo7j+b5tcJ/fKhH5hlImOTXjLIdm3MUuz4n58of76mfO3SYaTxblrM4k85derLtPyt7xBZ/MrQsefsq7NeQpJ4jOdhRMYGzAZyoUg7Bf3SWv5MKcCs0qS1wQxh5zJsG65td6FSr3AyKh2nmndP3WYDP+5wTdx3vOAog8MCfH71LgQu7XfG8eOwzNEEDGYTL9JNKLrSPLrBcLolrXkh+YoIWuXwauEIJpJ2WCJ2HJeypKHptT7KxVBDXHYQzw9oqSds8NuUjuVsNuBcXevN6MFoha4BDb+Nc5dfix4+BY39WtLXYtayjXeUbEyeezK5QfQHDA54/jknxmCm9FpuXnafnmGXH3PZl+SzOPTMhLIfXITKN5mrqR6ef3RcFOfxk2XGS/kTEBmExRwwywzXFIrcmBmkDJEELIjPqqm3BuxrVmd3gANbSrbMbbGoyBh8pgYcKN0hmhGPgahE2FOi33fr8SfqWpNW91pnAN3jE74BmZlp4Xh8XtP28UltRAbTbO64oz+1g5eLpwLk+i9y+QRxW695YhItNVlOpFjOVZNVSnwKlGaM3qzvDH5MS5SxunQzUXGw2h4nFHiczVWgzXr8eBgL+Z9UJg5m8HkENJUPTauAOg9M6F7vipevqQqlodrOgZsuGwz0yDpYrI="
     - secure: "Qv8gndv4lmpMmZH43trqFgzSSV1YTTrUOZrzEeFBbwdoA8lmv7Drj5hYL1kBDxUzmn1IsTHbDTWK/mK4NzXIz7womxCXiFVj4NJsbVDelagQfVhWn2ZM3CxsITwsuumbdOpDjlW5HaQiGJfSV7wmc3/Vy8nQrOKXR3gciNqT9+a439KeLeqXjCrBp+DqBvziiXhtovFE37hqzQKn0Np7NMOZy0oxg/2nev/dOLKB65slp/zF1mocw/mCpZhtWCQh3yJg7STPWa3JppgbTLmzkZwXLohfxpekyEx474k+6XM4gEi6/4Vv4UDxx21kDXtDwr01ekC03AHLVPa/od0YxZCzCygrVWVsXmPVPCx1qD/AsaHbuLNf3u09H/dHwt/7HZmFGge4DtsTEl0gmsoL5yUi/g5nKOAE6e3znMfgAPFc8y2YJ0cRpzdAZYwBTX2u2ev6JLLIzZKC5rSfFx06KfcgkkkO4ygCelgkKHEjzNEpw7ntwi9N72zpWD6kdsOSTwVzLni98JpZRaxb1TfRPeyx88uR//CA1vp0VRd9EOc6Yl5F1WMXM6b1OCinIN/ITIzcRvhvUcj1c6Hfa5F4BsiQyKV372od5A/8qlfB6NbDG4Hol5V3VcIzQe02vKRyYFOQW9ATnA7c9Nch5UpbD1cChpD/knnQ6IqlVfEPchs="
@@ -17,13 +19,22 @@ install:
   - docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
 before_script:
-  - docker run -d --name=database postgres
+  - docker run --rm -d --name=database postgres
 
 script:
-  - docker run -e DB_HOST=database -e MIX_ENV=test --link=database $IMAGE_NAME:$IMAGE_TAG bash -c "./wait_for_services.sh && mix test 1>&1"
+  - docker run --rm -e DB_HOST=database -e MIX_ENV=test --link=database $IMAGE_NAME:$IMAGE_TAG bash -c "./wait_for_services.sh && mix test 1>&1"
 
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - docker push edevil/haypoll:$IMAGE_TAG
+#  - [ "${TRAVIS_PULL_REQUEST}" = "false" ] && docker push $IMAGE_NAME:$IMAGE_TAG || false
+  - docker push $IMAGE_NAME:$IMAGE_TAG
+
+before_deploy:
   - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-deployment.yml
-  - docker run --rm -v `pwd`:/app lachlanevenson/k8s-kubectl:v1.2.4 --server=$KUBERNETES_HOST --certificate-authority=/app/ca.pem --token=$K8S_TOKEN apply -f /app/haypoll-deployment.yml --namespace=haypoll
+
+deploy:
+  provider: script
+  skip_cleanup: true
+  script: docker run --rm -v `pwd`:/app lachlanevenson/k8s-kubectl:v1.2.4 --server=$KUBERNETES_HOST --certificate-authority=/app/ca.pem --token=$K8S_TOKEN apply -f /app/haypoll-deployment.yml --namespace=haypoll
+  on:
+    branch: master
