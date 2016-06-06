@@ -26,8 +26,7 @@ script:
 
 after_success:
   - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-#  - [ "${TRAVIS_PULL_REQUEST}" = "false" ] && docker push $IMAGE_NAME:$IMAGE_TAG || false
-  - docker push $IMAGE_NAME:$IMAGE_TAG
+  - [ "${TRAVIS_PULL_REQUEST}" = "false" ] && docker push $IMAGE_NAME:$IMAGE_TAG || false
 
 before_deploy:
   - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-deployment.yml
