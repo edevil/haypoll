@@ -19,7 +19,7 @@ install:
   - docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
 before_script:
-  - docker run --rm -d --name=database postgres
+  - docker run -d --name=database postgres
 
 script:
   - docker run --rm -e DB_HOST=database -e MIX_ENV=test --link=database $IMAGE_NAME:$IMAGE_TAG bash -c "./wait_for_services.sh && mix test 1>&1"
