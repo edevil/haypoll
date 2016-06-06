@@ -3,6 +3,6 @@ defmodule Haypoll.PageControllerTest do
 
   test "GET /" do
     conn = get conn(), "/"
-    assert html_response(conn, 200) =~ "Welcome to Phoenix2!"
+    assert html_response(conn, 200) =~ "Welcome to Phoenix3!"
   end
 end
