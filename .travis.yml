@@ -34,6 +34,7 @@ before_deploy:
   - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-migration.yml
   - $KUBECTL create -f /app/haypoll-migration.yml --namespace=haypoll
   - export POD=$($KUBECTL get pods --selector=app=haypoll-migration --namespace=haypoll --output=jsonpath={.items..metadata.name})
+  - while [ `$KUBECTL get pod $POD --namespace=haypoll --output=jsonpath={.status.phase}` = "Pending" ]; do echo "Waiting for pod"; sleep 1; done
   - $KUBECTL attach $POD --namespace=haypoll || true
   - $KUBECTL delete -f /app/haypoll-migration.yml --namespace=haypoll
 
