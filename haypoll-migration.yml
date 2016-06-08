@@ -1,0 +1,22 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: haypoll-migration-job
+spec:
+  activeDeadlineSeconds: 100
+  template:
+    metadata:
+      name: haypoll-migration-tmpl
+      labels:
+        app: haypoll-migration
+    spec:
+      containers:
+      - name: haypoll-migration
+        image: edevil/haypoll:latest
+        command: ["mix", "ecto.migrate"]
+        env:
+          - name: DB_HOST
+            value: database
+          - name: DB_PASS
+            value: postgres
+      restartPolicy: Never
