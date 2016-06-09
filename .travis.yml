@@ -33,7 +33,7 @@ before_deploy:
   - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-deployment.yml
   - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-migration.yml
   - $KUBECTL create -f /app/haypoll-migration.yml --namespace=haypoll
-  - while [ -z `$KUBECTL get pods -a --selector=app=haypoll-migration --namespace=haypoll --output=jsonpath={.items..metadata.name}` ]; do echo "Waiting for pod to be provisioned: $POD"; sleep 1; done
+  - while [[ -z `$KUBECTL get pods -a --selector=app=haypoll-migration --namespace=haypoll --output=jsonpath={.items..metadata.name}` ]]; do echo "Waiting for pod to be provisioned: $POD"; sleep 1; done
   - export POD=$($KUBECTL get pods --selector=app=haypoll-migration --namespace=haypoll --output=jsonpath={.items..metadata.name})
   - while [ `$KUBECTL get pod -a $POD --namespace=haypoll --output=jsonpath={.status.phase}` = "Pending" ]; do echo "Waiting for pod to start: $POD"; sleep 1; done
   - while [ `$KUBECTL get pod -a $POD --namespace=haypoll --output=jsonpath={.status.phase}` = "Running" ]; do echo "Waiting for pod to finish: $POD"; sleep 1; done
