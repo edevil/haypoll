@@ -23,6 +23,24 @@ spec:
             value: database
           - name: DB_PASS
             value: postgres
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                fieldPath: status.podIP
+          - name: ERLANG_COOKIE
+            valueFrom:
+              secretKeyRef:
+                name: app-config
+                key: erlang-cookie
+        args: ["elixir", "--name", "$(MY_POD_NAMESPACE)@$(MY_POD_IP)", "--cookie", "$(ERLANG_COOKIE)", "-S", "mix", "phoenix.server", "--no-deps-check", "--no-compile", "--no-halt"]
         ports:
         - containerPort: 8080
         livenessProbe:
@@ -42,4 +60,8 @@ spec:
               - name: X-Custom-Header
                 value: Awesome
           timeoutSeconds: 1
+      - name: kube-proxy
+        image: gcr.io/google_containers/kubectl:v0.18.0-120-gaeb4ac55ad12b1-dirty
+        imagePullPolicy: Always
+        args: ["proxy", "-p", "8001"]
   minReadySeconds: 2
