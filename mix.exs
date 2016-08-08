@@ -19,7 +19,7 @@ defmodule Haypoll.Mixfile do
   def application do
     [mod: {Haypoll, []},
      applications: [:phoenix, :phoenix_html, :cowboy, :logger,
-                    :phoenix_ecto, :postgrex]]
+                    :phoenix_ecto, :postgrex, :elixir_kubernetes_cluster]]
   end
 
   # Specifies which paths to compile per environment.
