@@ -35,7 +35,7 @@ defmodule Haypoll.Mixfile do
      {:postgrex, ">= 0.0.0"},
      {:phoenix_html, "~> 2.3"},
      {:phoenix_live_reload, "~> 1.0", only: :dev},
-     {:elixir_kubernetes_cluster, "~> 0.1.3"},
+     {:elixir_kubernetes_cluster, "~> 0.1.4"},
      {:cowboy, "~> 1.0"}]
   end
 
