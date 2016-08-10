@@ -25,21 +25,32 @@ script:
   - docker run --rm -e DB_HOST=database -e MIX_ENV=test --link=database $IMAGE_NAME:$IMAGE_TAG bash -c "./wait_for_services.sh && mix test 1>&1"
 
 after_success:
-  - docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
-  - "[ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ] && docker push $IMAGE_NAME:$IMAGE_TAG || false"
+  - if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
+      docker login -e="$DOCKER_EMAIL" -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD" &&
+      travis_retry docker push ${IMAGE_NAME}:${IMAGE_TAG};
+    fi
 
 before_deploy:
-  - export KUBECTL="docker run --rm -v `pwd`:/app lachlanevenson/k8s-kubectl:v1.2.4 --server=$KUBERNETES_HOST --certificate-authority=/app/ca.pem --token=$K8S_TOKEN"
-  - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-deployment.yml
-  - sed -i.bak "s#$IMAGE_NAME:latest#$IMAGE_NAME:$IMAGE_TAG#" haypoll-migration.yml
-  - $KUBECTL create -f /app/haypoll-migration.yml --namespace=haypoll
-  - while [ -z `$KUBECTL get pods --selector=app=haypoll-migration --namespace=haypoll --output=jsonpath={.items..metadata.name}` ]; do echo "Waiting for pod to be provisioned - $POD"; sleep 1; done
-  - export POD=$($KUBECTL get pods --selector=app=haypoll-migration --namespace=haypoll --output=jsonpath={.items..metadata.name})
-  - while [ `$KUBECTL get pod -a $POD --namespace=haypoll --output=jsonpath={.status.phase}` = "Pending" ]; do echo "Waiting for pod to start - $POD"; sleep 1; done
-  - while [ `$KUBECTL get pod -a $POD --namespace=haypoll --output=jsonpath={.status.phase}` = "Running" ]; do echo "Waiting for pod to finish - $POD"; sleep 1; done
-  - $KUBECTL get pod -a $POD --namespace=haypoll --output=jsonpath={.status.phase}
-  - $KUBECTL logs $POD --namespace=haypoll
-  - $KUBECTL delete -f /app/haypoll-migration.yml --namespace=haypoll
+  - travis_retry docker pull $KUBECTL_IMAGE
+  - set -e
+  - export KUBECTL="docker run --rm -v `pwd`:/app $KUBECTL_IMAGE --server=$KUBERNETES_HOST --certificate-authority=/app/ca.pem --token=$K8S_TOKEN"
+  - sed -i.bak "s#${IMAGE_NAME}:latest#${IMAGE_NAME}:${IMAGE_TAG}#" ${KUBE_APP}-depl.yml
+  - sed -i.bak "s#${IMAGE_NAME}:latest#${IMAGE_NAME}:${IMAGE_TAG}#" ${KUBE_APP}-migration.yml
+  - $KUBECTL create -f /app/${KUBE_APP}-migration.yml --namespace=$KUBE_NAMESPACE
+  - while [[ -z `$KUBECTL get pods --selector=app=${KUBE_APP}-migration --namespace=$KUBE_NAMESPACE --output=jsonpath={.items..metadata.name}` ]]; do
+      echo "Waiting for pod to be provisioned - $POD";
+      sleep 1;
+    done;
+  - export POD=$($KUBECTL get pods --selector=app=${KUBE_APP}-migration --namespace=$KUBE_NAMESPACE --output=jsonpath={.items..metadata.name})
+  - export CURRENT_STATUS="$KUBECTL get pod -a $POD --namespace=$KUBE_NAMESPACE --output=jsonpath={.status.phase}"
+  - while [[ `$CURRENT_STATUS` =~ ^(Pending|Running)$ ]]; do
+      echo "Waiting for pod to start and finish - $POD";
+      sleep 1;
+    done;
+  - $KUBECTL describe job ${KUBE_APP}-migration-job --namespace=$KUBE_NAMESPACE
+  - $KUBECTL get pod -a $POD --namespace=$KUBE_NAMESPACE --output=jsonpath={.status.phase} || true
+  - $KUBECTL logs $POD --namespace=$KUBE_NAMESPACE || true
+  - $KUBECTL delete -f /app/${KUBE_APP}-migration.yml --namespace=$KUBE_NAMESPACE;
 
 deploy:
   provider: script
