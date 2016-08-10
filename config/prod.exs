@@ -16,8 +16,8 @@ config :haypoll, Haypoll.Endpoint,
   url: [host: "example.com", port: 80],
   cache_static_manifest: "priv/static/manifest.json"
 
-# Do not print debug messages in production
-config :logger, level: :info
+# Do not print debug messages in production. NOPE
+config :logger, level: :debug
 
 # ## SSL Support
 #
