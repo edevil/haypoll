@@ -27,12 +27,10 @@ before_install:
   - kubectl version || true
   - hash -r
   - kubectl version || true
-  - curl https://sdk.cloud.google.com | bash
-  - bash -l gcloud version || true
-  - bash -l gcloud components update kubectl || true
-  - kubectl version || true
+  - find / -name kubectl
 
 install:
+  - kubectl version || true
   - docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
 before_script:
