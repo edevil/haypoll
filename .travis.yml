@@ -22,11 +22,12 @@ env:
 before_install:
   - kubectl version || true
   - gcloud version || true
-  - gcloud components update kubectl || true
+  - sudo gcloud components update kubectl || true
   - kubectl version || true
   - curl https://sdk.cloud.google.com | bash
-  - bash -l ./gcloud.sh version
-  - bash -l ./gcloud.sh components update kubectl
+  - bash -l gcloud.sh version || true
+  - bash -l gcloud version || true
+  - bash -l gcloud.sh components update kubectl || true
   - kubectl version || true
 
 install:
