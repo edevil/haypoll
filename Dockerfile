@@ -3,7 +3,7 @@ FROM edevil/phoenix:latest
 MAINTAINER André Cruz <andre@cabine.org>
 
 # add PG client to image
-RUN apt-get install -y postgresql-client
+RUN apt-get update && apt-get install -y postgresql-client
 
 # add app code to image
 ADD . /deploy/app
