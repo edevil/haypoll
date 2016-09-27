@@ -27,7 +27,10 @@ before_install:
   - kubectl version || true
   - hash -r
   - kubectl version || true
-  - find / -name kubectl
+  - /usr/lib/google-cloud-sdk/bin/kubectl version || true
+  - export
+  - cat ~/.bashrc
+  - sudo find / -name kubectl
 
 install:
   - kubectl version || true
