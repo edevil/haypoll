@@ -42,7 +42,7 @@ before_deploy:
   - set -e
   - sed -i.bak "s#${IMAGE_NAME}:latest#${IMAGE_NAME}:${IMAGE_TAG}#" ${KUBE_APP}-depl.yml
   - sed -i.bak "s#${IMAGE_NAME}:latest#${IMAGE_NAME}:${IMAGE_TAG}#" ${KUBE_APP}-migration.yml
-  - $KUBECTL create -f /app/${KUBE_APP}-migration.yml --namespace=$KUBE_NAMESPACE
+  - $KUBECTL create -f ${KUBE_APP}-migration.yml --namespace=$KUBE_NAMESPACE
   - while [[ -z `$KUBECTL get pods --selector=app=${KUBE_APP}-migration --namespace=$KUBE_NAMESPACE --output=jsonpath={.items..metadata.name}` ]]; do
       echo "Waiting for pod to be provisioned - $POD";
       sleep 1;
@@ -56,11 +56,11 @@ before_deploy:
   - $KUBECTL describe job ${KUBE_APP}-migration-job --namespace=$KUBE_NAMESPACE
   - $KUBECTL get pod -a $POD --namespace=$KUBE_NAMESPACE --output=jsonpath={.status.phase} || true
   - $KUBECTL logs $POD --namespace=$KUBE_NAMESPACE || true
-  - $KUBECTL delete -f /app/${KUBE_APP}-migration.yml --namespace=$KUBE_NAMESPACE;
+  - $KUBECTL delete -f ${KUBE_APP}-migration.yml --namespace=$KUBE_NAMESPACE;
 
 deploy:
   provider: script
   skip_cleanup: true
-  script: $KUBECTL apply -f /app/${KUBE_APP}-depl.yml --namespace=$KUBE_NAMESPACE
+  script: $KUBECTL apply -f ${KUBE_APP}-depl.yml --namespace=$KUBE_NAMESPACE
   on:
     branch: master
