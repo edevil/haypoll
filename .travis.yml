@@ -23,11 +23,13 @@ before_install:
   - kubectl version || true
   - gcloud version || true
   - sudo gcloud components update kubectl || true
+  - gcloud version || true
+  - kubectl version || true
+  - hash -r
   - kubectl version || true
   - curl https://sdk.cloud.google.com | bash
-  - bash -l gcloud.sh version || true
   - bash -l gcloud version || true
-  - bash -l gcloud.sh components update kubectl || true
+  - bash -l gcloud components update kubectl || true
   - kubectl version || true
 
 install:
