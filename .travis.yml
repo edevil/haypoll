@@ -39,7 +39,6 @@ after_success:
     fi
 
 before_deploy:
-  - travis_retry docker pull $KUBECTL_IMAGE
   - set -e
   - sed -i.bak "s#${IMAGE_NAME}:latest#${IMAGE_NAME}:${IMAGE_TAG}#" ${KUBE_APP}-depl.yml
   - sed -i.bak "s#${IMAGE_NAME}:latest#${IMAGE_NAME}:${IMAGE_TAG}#" ${KUBE_APP}-migration.yml
