@@ -20,20 +20,11 @@ env:
     - secure: "ctuFbt0rC8aldc63bVUfi5ZsZzU+I/5ko8FtxzxIACIm/b/xHZf/rvcWA3Wdm5glnB8zbfq1VU/ymITXatNhSThd8hTjsdneF+l/KBQjGPZRpODMeGpoL+fL9Hf485i+v0NGMz0Wh+cagA5FU2CeGJ0wUHdyUFwy33sRMv7zGgJybppg3WArGTCPniY9fXWdnFmTfc9Rx+nRtJiGkB9Wej+8XSbHS6u+Z9GalRLuFd5WJ0lPzCIq7gbp9hfsWqG9YRWwmp7lQ3COg6TkgQGwUDeeW575tPFxJsgaW3eFa0adgBtGvmvSODAMjkhXpS9cUDrdj/n9MdgrNAObd+AAsRrKC+F376OgQhT0lDAT5TYF3AcZT6RUW8YaIk5O7kOzKq/3b+dVJbsg9OQ1LsGlBtbbZ1FufRY3W3UeHHPREagzP6pnATUpkl4UzhYomOBziYDkgTSPHQmmKdGlD/hthdCC7JmEMtlu+9ojdBhr5tcpxzD2uQBWIUe9dgiLvlECK37mCBuy6dN1rcA8CmbQae4kUXwX15Yr1U7Jy37Z1cV8IFd0ADhSV6feWCm/FlxxHX9iEifPaprtezKXEz9BDdrl3XRSml8HpbN6ecQ7Sc89/MXr8EMphGLZSVEAXCbLQbRiqjSQSVhis7kpSOFKcMXASkiBMb9vl+m0hz+oNLo="
 
 before_install:
-  - kubectl version || true
-  - gcloud version || true
-  - sudo gcloud components update kubectl || true
-  - gcloud version || true
-  - kubectl version || true
-  - hash -r
-  - kubectl version || true
-  - /usr/lib/google-cloud-sdk/bin/kubectl version || true
-  - export
-  - cat ~/.bashrc
-  - sudo find / -name kubectl
+  - sudo gcloud components update kubectl
+  - export PATH=$PATH:/usr/lib/google-cloud-sdk/bin
 
 install:
-  - kubectl version || true
+  - kubectl version
   - docker build -t $IMAGE_NAME:$IMAGE_TAG .
 
 before_script:
