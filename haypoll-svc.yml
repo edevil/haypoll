@@ -6,10 +6,10 @@ metadata:
     app: haypoll
     tier: frontend
 spec:
-  type: NodePort
+  type: LoadBalancer
   ports:
-  - port: 8080
-    nodePort: 31001
+  - port: 80
+    targetPort: 8080
   selector:
     app: haypoll
     tier: frontend
