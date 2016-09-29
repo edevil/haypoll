@@ -35,5 +35,16 @@ spec:
           requests:
             cpu: 100m
             memory: 500Mi
+        env:
+          - name: PGDATA
+            value: /var/lib/postgresql/data/pgdata
         ports:
         - containerPort: 5432
+        volumeMounts:
+          - name: volume-azure-bddata
+            mountPath: /var/lib/postgresql/data
+      volumes:
+      - name: volume-azure-bddata
+        azureDisk:
+          diskName: KubeAzureBDData
+          diskURI: https://vmsystemdisks.blob.microsoft.net/vhds/bd.vhd
