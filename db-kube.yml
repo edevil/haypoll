@@ -47,4 +47,4 @@ spec:
       - name: volume-azure-bddata
         azureDisk:
           diskName: KubeAzureBDData
-          diskURI: https://vmsystemdisks.blob.microsoft.net/vhds/bd.vhd
+          diskURI: https://vmsystemdisks.blob.core.windows.net/vhds/data-disk-103116171920.vhd
